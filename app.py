@@ -24,9 +24,13 @@ app.layout = html.Div([
 app.layout = html.Div([
     html.H2('Hello World Sir'),
     dcc.Dropdown(
-        id='dropdown',
-        options=[{'label': i, 'value': i} for i in ['LA', 'NYC', 'MTL', 'ABJ']],
-        value='LA'
+        options=[
+            {'label': 'New York City', 'value': 'NYC'},
+            {'label': 'Montréal', 'value': 'MTL'},
+            {'label': 'San Francisco', 'value': 'SF'}
+        ],
+        multi=True,
+        value="MTL"
     ),
 
     html.Div(id='display-value')
