@@ -1,5 +1,5 @@
-import sys
-print(sys.executable)
+#import sys
+#print(sys.executable)
 
 import dash
 import dash_core_components as dcc
