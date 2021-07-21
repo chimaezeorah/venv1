@@ -23,11 +23,11 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
-auth = dash_auth.BasicAuth(
-    app,
-    {'chimagetfit': 'business-intelligence',
-     'tom': 'mantom'}
-)
+#auth = dash_auth.BasicAuth(
+    #app,
+    #{'chima': 'business-intelligence',
+     #'tom': 'mantom'}
+#)
 
 
 while True:
