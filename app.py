@@ -85,7 +85,7 @@ while True:
     df1['updated_at'] = pd.to_datetime(df1['updated_at']).dt.strftime('%Y-%m-%d')
     df1['created_at'] = pd.to_datetime(df1['created_at']).dt.strftime('%Y-%m-%d')
 
-    print(df1)
+    #print(df1)
     df7 = pd.read_csv('data/orderproducts.csv')
     df14 = pd.read_csv('data/employees.csv')
     df20 = pd.read_csv('data/products.csv')
@@ -94,7 +94,7 @@ while True:
 
     df8 = df7[['id', 'product_id', 'order_id', 'status', 'created_at']]
 
-    print("csv imported")
+    #print("csv imported")
 
 
 
@@ -113,19 +113,19 @@ while True:
 
 
 
-    print(df21)
+    #print(df21)
 
     df22 = df21.groupby('name').size().reset_index(name='products sold')
     #print(df22)
     #df22.count()
 
     #number of sales as per getfit employee
-    print(df14.shape)
+    #print(df14.shape)
     df200 = df14[~df14['name'].isin(['PROMO', 'Real Oviawe'])]
     df16 = pd.merge(df1, df14, left_on="employee_id", right_on="id")
 
     df300 = pd.merge(df1, df200, left_on="employee_id", right_on="id")
-    print(df200.shape)
+    #print(df200.shape)
 
 
     df17 = df16.groupby('name').size().reset_index(name='number of sales')
@@ -136,11 +136,11 @@ while True:
 
 
 
-    print(df16)
-    for col in df16.columns:
-        print(col)
+    #print(df16)
+    #for col in df16.columns:
+        #print(col)
 
-    print(df25)
+    #print(df25)
 
     #break;
 
@@ -154,7 +154,7 @@ while True:
     available_employee = df14['name'].unique()
 
 
-    print(available_employee)
+    #print(available_employee)
 
 
 
@@ -274,8 +274,8 @@ while True:
                        },
               inplace=True)
 
-    print("all imported data")
-    print("looping again")
+    #print("all imported data")
+    #print("looping again")
 
     #app = dash.Dash(__name__)
 
