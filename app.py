@@ -30,7 +30,6 @@ auth = dash_auth.BasicAuth(
 )
 
 
-
 while True:
     #time.sleep(5)
     #HOST = "63.250.45.202"  # or "domain.com"
