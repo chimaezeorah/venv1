@@ -480,7 +480,7 @@ while True:
 
 
         dbc.Row([
-            dbc.Col(dbc.Card(html.H3(children='Daily Getfit Conversions (1 line graph per employee)',
+            dbc.Col(dbc.Card(html.H3(children='Daily Getfit Conversions ( line graph per employee)',
                                      className="text-center text-light bg-dark"), body=True, color="dark")
                     , className="mb-4")
         ]),
