@@ -8,7 +8,7 @@ import pandas as pd
 from dash.dependencies import Output, Input
 import dash_table
 #import mysql.connector as mysql
-#import time
+import time
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
@@ -31,7 +31,7 @@ server = main.server
 
 
 while True:
-    #time.sleep(5)
+    time.sleep(5)
     #HOST = "63.250.45.202"  # or "domain.com"
 # database name, if you want just to connect to MySQL server, leave it empty
     #DATABASE = "getfit"
