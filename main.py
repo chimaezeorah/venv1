@@ -19,9 +19,9 @@ import dash_auth
 
 # needed only if running this as a single page app
 external_stylesheets = [dbc.themes.BOOTSTRAP]
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+main = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
-server = app.server
+server = main.server
 
 #auth = dash_auth.BasicAuth(
     #app,
@@ -125,13 +125,18 @@ while True:
     df16 = pd.merge(df1, df14, left_on="employee_id", right_on="id")
 
     df300 = pd.merge(df1, df200, left_on="employee_id", right_on="id")
+
+    #dfc = df300[["created_at_x", "name"]]
+
+    #dfc2 = pd.pivot_table(dfc, index=['created_at_x'], columns='name')
+
+    #print(dfc)
     #print(df200.shape)
 
 
     df17 = df16.groupby('name').size().reset_index(name='number of sales')
 
-    df25 = df16.groupby(['name', 'created_at_x']
-                    ).size().unstack(fill_value=0)
+
 
 
 
@@ -151,7 +156,7 @@ while True:
 
     #df['date'] = pd.to_datetime(df['date']).dt.date
 
-    available_employee = df14['name'].unique()
+    available_employee = df14['name']
 
 
     #print(available_employee)
@@ -169,7 +174,7 @@ while True:
         #color=df2.groupby("country")["counts"].agg(sum),
         #color_continuous_scale=px.colors.sequential.RdBu,  # color
         text="counts",
-
+        #color_continuous_scale=px.colors.sequential.RdBu,
         #text=df2.groupby("country")["counts"].agg(sum),  # text
         title="Nigerian Customers Count",  # title
         orientation="v",# horizonal bar chart
@@ -282,7 +287,7 @@ while True:
 
 
 
-    app.layout = html.Div([
+    main.layout = html.Div([
 
 
 
@@ -519,7 +524,7 @@ while True:
         dbc.Row([
             dbc.Col(dbc.Card(html.H3(children='Offline Sales',
                                      className="text-center text-light bg-dark"), body=True, color="dark")
-                    , className="mb-4")
+                    , className="mb-4"),
         ]),
 
         dbc.Row([
@@ -550,7 +555,7 @@ while True:
 
 
 
-    @app.callback(
+    @main.callback(
         Output('test_cell', 'children'),
         Input('table', 'active_cell'))
     def return_cell_info(active_cell):
@@ -583,7 +588,7 @@ while True:
 
         #dfc2 = pd.pivot_table(dfc2, values=employee, index=['order_id'], columns='name')
 
-    @app.callback(
+    @main.callback(
         [dash.dependencies.Output('cases_or_deaths_country', 'figure'),
          dash.dependencies.Output('total_cases_or_deaths_country', 'figure')],
         [dash.dependencies.Input('emp_name', 'value')
@@ -592,7 +597,7 @@ while True:
         ])
 
 
-    def update_graph(name):
+    def update_graph(emp_name1):
 
         #f_df = df300[df300['name'] == name]
 
@@ -602,42 +607,57 @@ while True:
         #filtered_data1 = df16[df16["name"] == name]
         #filtered_data2 = df[df25["name"] == name]
 
-        df27 = df300.groupby(['created_at_x', 'name']).size().unstack(fill_value=0)
-        df25 = df300.groupby(['created_at_x', 'name']).size().unstack(fill_value=0).apply(lambda x: x.cumsum())
+        #dfc = pd.pivot_table(df300, values=emp_name1, index=['created_at_x'], columns='name')
+
+        #print(dfc)
+
+        dfc1 = df300.copy()
+        dfc1 = dfc1[dfc1.name.isin(emp_name1)]
+        dfc1 = dfc1.groupby(['created_at_x', 'name']).size().unstack(fill_value=0)
+
+        dfc2 = df300.copy()
+        dfc2 = dfc2[dfc2.name.isin(emp_name1)]
+        dfc2 = dfc2.groupby(['created_at_x', 'name']).size().unstack(fill_value=0).apply(lambda x: x.cumsum())
 
 
 
         fig5 = go.Figure()
-        for col in df27.columns:
-            fig5.add_trace(go.Scatter(x=df27.index, y=df27[col].values, name=col, mode='markers+lines'))
+        for col in dfc1.columns:
+            fig5.add_trace(go.Scatter(x=dfc1.index, y=dfc1[col].values, name=col, mode='markers+lines'))
 
-        fig5.update_layout(yaxis_title='Number Per 1 Million',
+        fig5.update_layout(yaxis_title='Sale Per Customer Rep',
                            paper_bgcolor='rgba(0,0,0,0)',
                            plot_bgcolor='rgba(0,0,0,0)',
                            template="seaborn",
                            #color="df27[col].values",
                            #style={"height": "50%", "width": "40%"},
-                           margin=dict(t=0))
+                           margin=dict(t=0),
+                           width=1400,
+                           height=300
+                           )
 
 
 
 
         fig6 = go.Figure()
-        for col in df25.columns:
-            fig6.add_trace(go.Scatter(x=df25.index, y=df25[col].values,
+        for col in dfc2.columns:
+            fig6.add_trace(go.Scatter(x=dfc2.index, y=dfc2[col].values,
                                       name=col,
                                       mode='markers+lines'))
 
-            fig6.update_layout(yaxis_title='Number Per 1 Million',
+            fig6.update_layout(yaxis_title='Cumulative sale per Customer Rep',
                                paper_bgcolor='rgba(0,0,0,0)',
                                plot_bgcolor='rgba(0,0,0,0)',
                                template="seaborn",
                                #color="df27[col].values",
-                               margin=dict(t=0))
+                               margin=dict(t=0),
+                               width=1400,
+                               height=300
+                               )
 
 
         return fig5, fig6
 
 
     if __name__ == '__main__':
-        app.run_server(debug=False)
+        main.run_server(debug=True)
