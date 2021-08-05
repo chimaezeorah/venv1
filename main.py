@@ -770,7 +770,7 @@ while True:
          ])
 
 
-    def update_graph(emp_name1,start_date, end_date):
+    def update_graph(emp_name1, start_date, end_date):
 
         #f_df = df300[df300['name'] == name]
 
@@ -785,10 +785,12 @@ while True:
         #print(dfc)
 
         dfc1 = df300.copy()
+        #dfc1 = dfc1[(dfc1['name'] == emp_name1)]
         dfc1 = dfc1[dfc1.name.isin(emp_name1)]
         dfc1 = dfc1.groupby(['created_at_x', 'name']).size().unstack(fill_value=0)
 
         dfc2 = df300.copy()
+        #dfc2 = dfc2[(dfc2['name'] == emp_name1) & (dfc2["created_at_x"] == start_date)]
         dfc2 = dfc2[dfc2.name.isin(emp_name1)]
         dfc2 = dfc2.groupby(['created_at_x', 'name']).size().unstack(fill_value=0).apply(lambda x: x.cumsum())
 
