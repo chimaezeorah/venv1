@@ -1,5 +1,6 @@
 #import sys
 #print(sys.executable)
+#used to import libraries that
 
 import dash
 import dash_core_components as dcc
@@ -12,8 +13,11 @@ import time
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
-#from datetime import datetime, date
+#from datetime import datetime, date as dt
+from datetime import datetime as dt
 import dash_auth
+
+
 
 
 
@@ -23,15 +27,15 @@ main = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = main.server
 
-#auth = dash_auth.BasicAuth(
-    #app,
-    #{'chima': 'business-intelligence',
-     #'tom': 'mantom'}
-#)
+auth = dash_auth.BasicAuth(
+    main,
+    {'chima': 'business-intelligence',
+     'tom': 'mantom'}
+)
 
 
 while True:
-    time.sleep(5)
+    time.sleep(30)
     #HOST = "63.250.45.202"  # or "domain.com"
 # database name, if you want just to connect to MySQL server, leave it empty
     #DATABASE = "getfit"
@@ -53,9 +57,10 @@ while True:
     #database_name = cursor.fetchone()
     #print("[+] You are connected to the database:", database_name)
 # fetch the database
-
     #df = cursor.execute("select * from customers")
-# get all selected rows    #rows = cursor.fetchall()
+# get all selected rows
+    #rows = cursor.fetchall()
+    #df = pd.read_sql("select * from customers", db_connection)
 
     df = pd.read_csv('data/customers.csv')
     df100 = df[['id', 'name', 'phone', 'email', 'state', 'country', 'created_at', 'updated_at']]
@@ -67,8 +72,12 @@ while True:
 
     #df10.count()
 
+    print("done importing customers")
+
 
     df1 = pd.read_csv('data/orders.csv')
+    #df1 = cursor.execute("select * from orders")
+    #df1 = pd.read_sql("select * from orders", db_connection)
 
     #limo = df1[df1['note']].isin(['Limo dennis', 'Limo dennis(influencer)'])
     #nysc = df1[df1['note']].isin(['NYSC sales'])
@@ -85,16 +94,41 @@ while True:
     df1['updated_at'] = pd.to_datetime(df1['updated_at']).dt.strftime('%Y-%m-%d')
     df1['created_at'] = pd.to_datetime(df1['created_at']).dt.strftime('%Y-%m-%d')
 
+
     #print(df1)
     df7 = pd.read_csv('data/orderproducts.csv')
+    print("finished importing orders")
+
+    #df7 = cursor.execute("select * from orderproducts")
+    #df7 = pd.read_sql("select * from order_products", db_connection)
     df14 = pd.read_csv('data/employees.csv')
+
+    #df14 = cursor.execute("select * from employees")
+    #df14 = pd.read_sql("select * from employees", db_connection)
     df20 = pd.read_csv('data/products.csv')
+
+    #df20 = cursor.execute("select * from products")
+    #df20 = pd.read_sql("select * from products", db_connection)
     #df2 = df6.groupby('country').size().reset_index(name='counts')
     #df5 = df[(df.country =="nigeria")]
+
+    print("done")
 
     df8 = df7[['id', 'product_id', 'order_id', 'status', 'created_at']]
 
     #print("csv imported")
+
+    #df400 = pd.read_sql("select * from customer_reviews", db_connection)
+    df400 = pd.read_csv('data/customer_reviews.csv')
+
+    df407 = pd.merge(df400, df14, left_on="customer_id", right_on="id")
+
+
+
+
+    #df402 = df401[['id', 'name', 'phone', 'email', 'state', 'country', 'created_at_', 'updated_at']]
+
+
 
 
 
@@ -109,15 +143,50 @@ while True:
 
     #matching total getfit product sales
     df15 = df7[df7['status'].isin([1])]
+
+    print(df15)
+    for col in df15.columns:
+        print(col)
+
+
+    print(df20)
+    for col in df20.columns:
+        print(col)
+
     df21 = pd.merge(df15, df20, left_on="product_id", right_on="product_id")
 
+    df401 = pd.merge(df400, df14, left_on="staff_id", right_on="id")
+    # for col in df401.columns:
+    # print(col)
 
+    df405 = pd.merge(df15, df1, left_on="order_id", right_on="id")
+    # for col in df405.columns:
+    # print(col)
+
+    df406 = pd.merge(df405, df, left_on="customer_id", right_on="id")
+    for col in df406.columns:
+        print(col)
+
+
+    for col in df20.columns:
+        print(col)
+
+    df407 = pd.merge(df406, df20, left_on="product_id", right_on="product_id")
+    for col in df407.columns:
+        print(col)
+
+    df408 = df407[["product_id", "updated_at_x", "delivery_address", "state", "name_x", "note", "name_y", "phone"]]
 
     #print(df21)
 
     df22 = df21.groupby('name').size().reset_index(name='products sold')
     #print(df22)
     #df22.count()
+
+    #df410 = df21.groupby('name', 'amount')
+    #for col in df410.columns:
+        #print(col)
+
 
     #number of sales as per getfit employee
     #print(df14.shape)
@@ -298,6 +367,11 @@ while True:
             dbc.Row([
             dbc.Col(html.H4('Getfit Analytics Dashboard', className="header-title", style={'text-align': 'center', 'color': 'blue'}))]),
 
+        dbc.Row([
+            dbc.Col(html.H4('', className="header-title",
+                            style={'text-align': 'center', 'color': 'blue'}))]),
+        dbc.Row([
+            dbc.Col(html.H4('', className="header-title", style={'text-align': 'center', 'color': 'blue'}))]),
 
             dbc.Row([
                 dbc.Col(dbc.Card(html.H6(children='Customers Latest Update',
@@ -330,9 +404,67 @@ while True:
 
                 ),
 
-
-
         dcc.Markdown(id='test_cell'),
+
+        dbc.Row([
+            dbc.Col(html.H4('Customers Orders', className="header-title",
+                            style={'text-align': 'left', 'color': 'red'}))]),
+
+        dash_table.DataTable(
+            id='table2',
+            columns=[{"id": i, "name": i} for i in df408.columns],
+            data=df408.to_dict('records'),
+            # data=df1.to_dict('records'),
+            page_size=5,
+            filter_action='native',
+            export_format='xlsx',
+            export_headers='display',
+            merge_duplicate_headers=True,
+            # style_table={'margin:2px'},
+            # style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+            style_cell={
+                # 'backgroundColor': 'rgb(50, 50, 50)',
+                'color': 'black',
+                'left-padding': '10%'
+
+            },
+
+        ),
+
+
+
+
+
+
+
+        dcc.Markdown(id='test_cell1'),
+
+        dbc.Row([
+            dbc.Col(html.H4('Customer Reviews', className="header-title",
+                            style={'text-align': 'left', 'color': 'red'}))]),
+
+        dash_table.DataTable(
+            id='table3',
+            columns=[{"id": i, "name": i} for i in df400.columns],
+            data=df400.to_dict('records'),
+            # data=df1.to_dict('records'),
+            page_size=5,
+            filter_action='native',
+            export_format='xlsx',
+            export_headers='display',
+            merge_duplicate_headers=True,
+            # style_table={'margin:2px'},
+            # style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+            style_cell={
+                # 'backgroundColor': 'rgb(50, 50, 50)',
+                'color': 'black',
+                'left-padding': '10%'
+
+            },
+
+        ),
+
+        dcc.Markdown(id='test_cell3'),
 
             dbc.Row([
                 dbc.Col(html.H5(children='--------------------------------------------------', className="text-center"),
@@ -423,16 +555,6 @@ while True:
 
 
              #dbc.Col(html.H5(children='Breakdown of cases: whether residing in dorms', className="text-center")),
-
-
-
-
-
-
-
-
-
-
             ]),
 
 
@@ -445,28 +567,28 @@ while True:
 
            # dbc.Row(
                # [
-                    #dbc.Col(html.Div(children="One of three columns")),
-                 #   dash_table.DataTable(
-                       # id='table2',
+                        #dbc.Col(html.Div(children="One of three columns")),
+                        #   dash_table.DataTable(
+                        # id='table2',
                         #columns=[{"name": i, "id": i} for i in df8.columns],
 
-                       # data=df8.to_dict('records'),
+                        # data=df8.to_dict('records'),
                         # data=df1.to_dict('records'),
-                       # page_size=5,
-                       # filter_action='native',
-                       # export_format='xlsx',
-                      #  export_headers='display',
-                       # merge_duplicate_headers=True,
+                        # page_size=5,
+                        # filter_action='native',
+                        # export_format='xlsx',
+                        #  export_headers='display',
+                        # merge_duplicate_headers=True,
                         # style_table={'margin:2px'},
                         # style_header={'backgroundColor': 'rgb(30, 30, 30)'},
-                       # style_cell={
-                            # 'backgroundColor': 'rgb(50, 50, 50)',
-                         #   'color': 'black',
-                           # 'left-padding': '10%'
+                        # style_cell={
+                        # 'backgroundColor': 'rgb(50, 50, 50)',
+                        #   'color': 'black',
+                        # 'left-padding': '10%'
 
                         #},
 
-                   # ),
+                        # ),
 
                     #dcc.Markdown(id='test_cell1'),
 
@@ -490,6 +612,9 @@ while True:
                     , className="mb-4")
         ]),
 
+        dbc.Row([
+
+
         dcc.Dropdown(
             id='emp_name',
             options=[{'label': i, 'value': i} for i in available_employee],
@@ -497,6 +622,37 @@ while True:
             multi=True,
             style={'width': '70%', 'margin-left': '5px'}
             ),
+
+
+
+        dcc.DatePickerRange(
+            id='my-date-picker-range',  # ID to be used for callback
+            calendar_orientation='horizontal',  # vertical or horizontal
+            day_size=39,  # size of calendar image. Default is 39
+            end_date_placeholder_text="Return",  # text that appears when no end date chosen
+            with_portal=False,  # if True calendar will open in a full screen overlay portal
+            first_day_of_week=0,  # Display of calendar when open (0 = Sunday)
+            reopen_calendar_on_clear=True,
+            is_RTL=False,  # True or False for direction of calendar
+            clearable=True,  # whether or not the user can clear the dropdown
+            number_of_months_shown=1,  # number of months shown when calendar is open
+            min_date_allowed=dt(2020, 10, 1),  # minimum date allowed on the DatePickerRange component
+            max_date_allowed=dt(2022, 6, 20),  # maximum date allowed on the DatePickerRange component
+            initial_visible_month=dt(2021, 1, 1),  # the month initially presented when the user opens the calendar
+            start_date=dt(2020, 10, 1).date(),
+            end_date=dt(2022, 5, 15).date(),
+            display_format='MMM Do, YY',  # how selected dates are displayed in the DatePickerRange component.
+            month_format='MMMM, YYYY',  # how calendar headers are displayed when the calendar is opened.
+            minimum_nights=2,  # minimum number of days between start and end date
+
+            persistence=True,
+            persisted_props=['start_date'],
+            persistence_type='session',  # session, local, or memory. Default is 'local'
+
+            updatemode='singledate'  # singledate or bothdates. Determines when callback is triggered
+        ),
+
+        ]),
 
         #dcc.DatePickerRange(
             #id='my-date-picker-range',
@@ -561,11 +717,24 @@ while True:
     def return_cell_info(active_cell):
         return str(active_cell)
 
+
+    @main.callback(
+        Output('test_cell1', 'children'),
+        Input('table2', 'active_cell'))
+    def return_cell_info(active_cell):
+        return str(active_cell)
+
+    @main.callback(
+        Output('test_cell3', 'children'),
+        Input('table3', 'active_cell'))
+    def return_cell_info(active_cell):
+        return str(active_cell)
+
     #@app.callback(
        # Output('test_cell1', 'children'),
-      #  Input('table2', 'active_cell'))
-   # def return_cell_info(active_cell):
-      #  return str(active_cell)
+       #  Input('table2', 'active_cell'))
+       # def return_cell_info(active_cell):
+       #  return str(active_cell)
 
 
 
@@ -590,14 +759,18 @@ while True:
 
     @main.callback(
         [dash.dependencies.Output('cases_or_deaths_country', 'figure'),
-         dash.dependencies.Output('total_cases_or_deaths_country', 'figure')],
-        [dash.dependencies.Input('emp_name', 'value')
+         dash.dependencies.Output('total_cases_or_deaths_country', 'figure'),
+         #Output('cases_or_deaths_country', 'figure')
+         ],
+        [dash.dependencies.Input('emp_name', 'value'),
          #dash.dependencies.Input('my-date-picker-range', 'start_date'),
          #dash.dependencies.Input('my-date-picker-range', 'end_date')
-        ])
+         Input('my-date-picker-range', 'start_date'),
+         Input('my-date-picker-range', 'end_date')
+         ])
 
 
-    def update_graph(emp_name1):
+    def update_graph(emp_name1,start_date, end_date):
 
         #f_df = df300[df300['name'] == name]
 
@@ -618,6 +791,11 @@ while True:
         dfc2 = df300.copy()
         dfc2 = dfc2[dfc2.name.isin(emp_name1)]
         dfc2 = dfc2.groupby(['created_at_x', 'name']).size().unstack(fill_value=0).apply(lambda x: x.cumsum())
+
+        dfc3 = df300.copy()
+        dfc3 = df300.loc[start_date:end_date]
+
+
 
 
 
@@ -656,7 +834,21 @@ while True:
                                )
 
 
+
+
         return fig5, fig6
+
+
+    #@main.callback(
+        #Output('cases_or_deaths_country', 'figure'),
+        #[Input('my-date-picker-range', 'start_date'),
+         #Input('my-date-picker-range', 'end_date')]
+    #)
+    #def update_output(start_date, end_date):
+        # print("Start date: " + start_date)
+        # print("End date: " + end_date)
+        #dff = df.loc[start_date:end_date]
+        # print(dff[:5])
 
 
     if __name__ == '__main__':
