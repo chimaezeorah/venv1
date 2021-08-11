@@ -13,7 +13,7 @@ import time
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import plotly.express as px
-#from datetime import datetime, date as dt
+#from datetime import datetime, date as date
 from datetime import datetime as dt
 import dash_auth
 
@@ -175,6 +175,8 @@ while True:
     for col in df407.columns:
         print(col)
 
+    print(407)
+
     df408 = df407[["product_id", "updated_at_x", "delivery_address", "state", "name_x", "note", "name_y", "phone"]]
 
     #print(df21)
@@ -195,6 +197,9 @@ while True:
 
     df300 = pd.merge(df1, df200, left_on="employee_id", right_on="id")
 
+
+
+
     #dfc = df300[["created_at_x", "name"]]
 
     #dfc2 = pd.pivot_table(dfc, index=['created_at_x'], columns='name')
@@ -204,6 +209,11 @@ while True:
 
 
     df17 = df16.groupby('name').size().reset_index(name='number of sales')
+
+    dfc3 = df300.copy()
+    dfc3['created_at_x'] = pd.to_datetime(dfc3['created_at_x'])
+    dfc3.set_index('created_at_x', inplace=True)
+    print(dfc3)
 
 
 
@@ -226,6 +236,7 @@ while True:
     #df['date'] = pd.to_datetime(df['date']).dt.date
 
     available_employee = df14['name']
+    available_dates = df7['created_at']
 
 
     #print(available_employee)
@@ -623,34 +634,30 @@ while True:
             style={'width': '70%', 'margin-left': '5px'}
             ),
 
+        #dcc.Dropdown(
+               # id='date_name',
+               # options=[{'label': i, 'value': i} for i in available_dates],
+               # value=['2020-10-01 09:55:37'],
+                #multi=True,
+                #style={'width': '70%', 'margin-left': '5px'}
+           # ),
+
+            #dcc.DatePickerRange(
+                #id='date_range',
+                #day_size=50,
+                #reopen_calendar_on_clear=True,
+               # clearable=True,
+               # min_date_allowed=date(2021, 1, 1),
+               # max_date_allowed=date(2021, 12, 31),
+                # initial_visible_month = date(2020, 7, 1),
+               # start_date=date(2021, 6, 1),
+                #end_date=date(2021, 6, 30),
+                #minimum_nights=0,
+                #updatemode='singledate'
+            #),
 
 
-        dcc.DatePickerRange(
-            id='my-date-picker-range',  # ID to be used for callback
-            calendar_orientation='horizontal',  # vertical or horizontal
-            day_size=39,  # size of calendar image. Default is 39
-            end_date_placeholder_text="Return",  # text that appears when no end date chosen
-            with_portal=False,  # if True calendar will open in a full screen overlay portal
-            first_day_of_week=0,  # Display of calendar when open (0 = Sunday)
-            reopen_calendar_on_clear=True,
-            is_RTL=False,  # True or False for direction of calendar
-            clearable=True,  # whether or not the user can clear the dropdown
-            number_of_months_shown=1,  # number of months shown when calendar is open
-            min_date_allowed=dt(2020, 10, 1),  # minimum date allowed on the DatePickerRange component
-            max_date_allowed=dt(2022, 6, 20),  # maximum date allowed on the DatePickerRange component
-            initial_visible_month=dt(2021, 1, 1),  # the month initially presented when the user opens the calendar
-            start_date=dt(2020, 10, 1).date(),
-            end_date=dt(2022, 5, 15).date(),
-            display_format='MMM Do, YY',  # how selected dates are displayed in the DatePickerRange component.
-            month_format='MMMM, YYYY',  # how calendar headers are displayed when the calendar is opened.
-            minimum_nights=2,  # minimum number of days between start and end date
 
-            persistence=True,
-            persisted_props=['start_date'],
-            persistence_type='session',  # session, local, or memory. Default is 'local'
-
-            updatemode='singledate'  # singledate or bothdates. Determines when callback is triggered
-        ),
 
         ]),
 
@@ -676,6 +683,39 @@ while True:
         ]),
 
         dcc.Graph(id='total_cases_or_deaths_country'),
+
+        dbc.Row([
+            dbc.Col(html.H5(children='Daily date Conversions figures', className="text-center"),
+                    className="mt-4"),
+        ]),
+
+        dcc.DatePickerRange(
+            id='my-date-picker-range',  # ID to be used for callback
+            calendar_orientation='horizontal',  # vertical or horizontal
+            day_size=39,  # size of calendar image. Default is 39
+            end_date_placeholder_text="Return",  # text that appears when no end date chosen
+            with_portal=False,  # if True calendar will open in a full screen overlay portal
+            reopen_calendar_on_clear=True,
+            is_RTL=False,  # True or False for direction of calendar
+            clearable=True,  # whether or not the user can clear the dropdown
+            number_of_months_shown=1,  # number of months shown when calendar is open
+            min_date_allowed=dt(2020, 10, 1),  # minimum date allowed on the DatePickerRange component
+            max_date_allowed=dt(2022, 6, 20),  # maximum date allowed on the DatePickerRange component
+            initial_visible_month=dt(2021, 1, 1),  # the month initially presented when the user opens the calendar
+            start_date=dt(2020, 10, 1).date(),
+            end_date=dt(2022, 5, 15).date(),
+            display_format='MMM Do, YY',  # how selected dates are displayed in the DatePickerRange component.
+            month_format='MMMM, YYYY',  # how calendar headers are displayed when the calendar is opened.
+            minimum_nights=2,  # minimum number of days between start and end date
+
+            persistence=True,
+            persisted_props=['start_date'],
+            persistence_type='session',  # session, local, or memory. Default is 'local'
+
+            updatemode='singledate'  # singledate or bothdates. Determines when callback is triggered
+        ),
+
+        dcc.Graph(id='date'),
 
         dbc.Row([
             dbc.Col(dbc.Card(html.H3(children='Offline Sales',
@@ -765,12 +805,13 @@ while True:
         [dash.dependencies.Input('emp_name', 'value'),
          #dash.dependencies.Input('my-date-picker-range', 'start_date'),
          #dash.dependencies.Input('my-date-picker-range', 'end_date')
-         Input('my-date-picker-range', 'start_date'),
-         Input('my-date-picker-range', 'end_date')
+         #dash.dependencies.Input('my-date-picker-range', 'start_date'),
+         #dash.dependencies.Input('my-date-picker-range', 'end_date')
+         #dash.dependencies.Input('date_name', 'value')
          ])
 
 
-    def update_graph(emp_name1, start_date, end_date):
+    def update_graph(emp_name1):
 
         #f_df = df300[df300['name'] == name]
 
@@ -790,12 +831,12 @@ while True:
         dfc1 = dfc1.groupby(['created_at_x', 'name']).size().unstack(fill_value=0)
 
         dfc2 = df300.copy()
-        #dfc2 = dfc2[(dfc2['name'] == emp_name1) & (dfc2["created_at_x"] == start_date)]
+        #dfc2 = dfc2[(dfc2['name'] == emp_name1) & (dfc2['created_at_x'].between(start_date, end_date))]
         dfc2 = dfc2[dfc2.name.isin(emp_name1)]
         dfc2 = dfc2.groupby(['created_at_x', 'name']).size().unstack(fill_value=0).apply(lambda x: x.cumsum())
 
-        dfc3 = df300.copy()
-        dfc3 = df300.loc[start_date:end_date]
+        #dfc3 = df300.copy()
+        #dfc3 = df300.loc[start_date:end_date]
 
 
 
@@ -817,8 +858,6 @@ while True:
                            )
 
 
-
-
         fig6 = go.Figure()
         for col in dfc2.columns:
             fig6.add_trace(go.Scatter(x=dfc2.index, y=dfc2[col].values,
@@ -835,10 +874,54 @@ while True:
                                height=300
                                )
 
-
-
-
         return fig5, fig6
+
+
+    @main.callback(
+        [dash.dependencies.Output('date', 'figure'),
+         #dash.dependencies.Output('total_cases_or_deaths_country', 'figure'),
+         #Output('cases_or_deaths_country', 'figure')
+         ],
+        [#dash.dependencies.Input('date_dt', 'value'),
+         dash.dependencies.Input('my-date-picker-range', 'start_date'),
+         dash.dependencies.Input('my-date-picker-range', 'end_date')
+         #dash.dependencies.Input('my-date-picker-range', 'start_date'),
+         #dash.dependencies.Input('my-date-picker-range', 'end_date')
+         #dash.dependencies.Input('date_name', 'value')
+         ])
+
+
+
+
+    def update_graph(start_date, end_date):
+
+
+        #dfc3['created_at_x'] = pd.to_datetime(dfc3['created_at_x'])
+        #dfc3.set_index('created_at_x', inplace=True)
+
+        #dfc3 = dfc3.loc[start_date:end_date]
+
+        dff = dfc3.loc[start_date:end_date]
+        dff = dff.groupby(["name"]).size().reset_index(name='counts')
+
+        fig7 = px.bar(
+            dff,  # dataframe
+            x="counts",  # x
+            y="name",  # y
+            labels={"x": "state", "y": "counts"},  # define label
+            color="counts",
+            # color=df2.groupby("country")["counts"].agg(sum),
+            # color_continuous_scale=px.colors.sequential.RdBu,  # color
+            text="counts",
+            # color_continuous_scale=px.colors.sequential.RdBu,
+            # text=df2.groupby("country")["counts"].agg(sum),  # text
+            title="Nigerian Customers Count",  # title
+            orientation="v",  # horizonal bar chart
+            height=600
+
+        )
+
+        return fig7
 
 
     #@main.callback(
