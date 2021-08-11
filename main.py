@@ -934,7 +934,5 @@ while True:
         # print("End date: " + end_date)
         #dff = df.loc[start_date:end_date]
         # print(dff[:5])
-
-
     if __name__ == '__main__':
         main.run_server(debug=True)
